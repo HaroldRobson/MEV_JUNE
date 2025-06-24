@@ -40,7 +40,6 @@ impl AskSPMatrix {
         self.data.get(&(exchange, token)).copied()
     }
 
-    // just for printin - dont worry about this too much
 
     pub fn print_matrix(&self) {
         if self.data.is_empty() {

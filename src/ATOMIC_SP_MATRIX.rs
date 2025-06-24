@@ -9,6 +9,12 @@ pub struct AtomicMatrix {
     data: [AtomicU64; 400],
 }
 
+// this is the strange data type i am using. you'll see in market_data.rs a prime number
+// mapping for each enumerated exchange and coin. by the FTA this gives me a unique index in the
+// strange Atomix array below. essentially an injective (but deffo not surjective - theres a lot
+// of redundant memory usage) map from a 2d object (a matrix) to a 1d vector
+//
+// this was necessary becasue i dont think rust has atomic matrices - only vectors.
 impl AtomicMatrix {
     pub fn new() -> Self {
         const ZERO: AtomicU64 = AtomicU64::new(0);
@@ -40,7 +46,6 @@ impl AtomicMatrix {
     pub fn print_matrix(&self, name: &str) {
         println!("{} PRICES:", name);
 
-        // Iterate through your known exchange/token combinations
         for exchange in ExchangeName::all() {
             for token in Token::all() {
                 if let Some(price) = self.get_data(exchange, token) {
@@ -68,7 +73,9 @@ impl AtomicMatrix {
         }
         prices
     }
-    // this function obviuouly is a bit shit and is here j for testing
+    // this function obviuouly is a bit shit and is here j for testing. only finds price
+    // differences on the same side (buy or ask) so isnt exactly useful for actual arbitrage
+    // (ie going from buy to aask)
     pub fn find_arb_ops(&self) {
         for token in Token::all() {
             let mut min_price: f64 = 1000000000 as f64;
